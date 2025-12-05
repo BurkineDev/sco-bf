@@ -1,0 +1,50 @@
+node_modules/
+.pnp/
+.pnp.js
+.next/
+out/
+dist/
+build/
+/.turbo/
+coverage/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+.env
+.env.local
+.env.*.local
+.DS_Store
+.vscode/
+*.swp
+idea/
+*.iml
+
+# React Native
+android/
+ios/
+*.keystore
+
+# macOS
+*.DS_Store
+
+# Logs
+logs
+*.log
+debug.log*
+
+# Editor directories and files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project
+
+# Misc
+.expo/
+/.expo-shared/
+android/.gradle/
+android/app/build/
+ios/Pods/
