@@ -45,9 +45,9 @@ export default function StudentsPage() {
   const filteredStudents = students.filter(student =>
     student.is_active &&
     (searchTerm === '' ||
-      student.display_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.display_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       student.matricule.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      student.class_name?.toLowerCase().includes(searchTerm.toLowerCase()))
+      student.class?.name?.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
   const activeStudents = students.filter(s => s.is_active).length
@@ -197,7 +197,7 @@ export default function StudentsPage() {
                         <div className="text-sm font-mono text-gray-900">{student.matricule}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{student.class_name || 'N/A'}</div>
+                        <div className="text-sm text-gray-900">{student.class?.name || 'N/A'}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm text-gray-900">
@@ -230,7 +230,7 @@ export default function StudentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => toast.info('Édition en cours de développement')}
+                            onClick={() => toast('Édition en cours de développement')}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
                             <Edit className="h-5 w-5" />

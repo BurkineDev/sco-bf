@@ -217,7 +217,7 @@ export default function AgentsPage() {
                             <Shield className="h-5 w-5" />
                           </button>
                           <button
-                            onClick={() => toast.info('Édition en cours de développement')}
+                            onClick={() => toast('Édition en cours de développement')}
                             className="text-indigo-600 hover:text-indigo-900"
                           >
                             <Edit className="h-5 w-5" />

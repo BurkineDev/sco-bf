@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useAuthStore, useAcademicYearsStore } from '@/lib/store'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabase'
 import { Loader2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
@@ -19,7 +19,7 @@ interface ClassModalProps {
 export function ClassModal({ open, onOpenChange, classItem, onSuccess }: ClassModalProps) {
   const { school } = useAuthStore()
   const { academicYears, fetchAcademicYears } = useAcademicYearsStore()
-  const supabase = createClientComponentClient()
+  
 
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
@@ -35,7 +35,7 @@ export function ClassModal({ open, onOpenChange, classItem, onSuccess }: ClassMo
 
   useEffect(() => {
     if (school && academicYears.length === 0) {
-      fetchAcademicYears(school.id)
+      fetchAcademicYears()
     }
   }, [school, academicYears, fetchAcademicYears])
 

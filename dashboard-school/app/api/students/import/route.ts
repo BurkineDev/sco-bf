@@ -230,7 +230,7 @@ async function parseCSV(buffer: Buffer): Promise<any[]> {
       complete: (results) => {
         resolve(results.data as any[])
       },
-      error: (error) => {
+      error: (error: any) => {
         reject(error)
       }
     })

@@ -195,7 +195,7 @@ export default function AcademicYearsPage() {
                         </Button>
                       )}
                       <button
-                        onClick={() => toast.info('Édition en cours de développement')}
+                        onClick={() => toast('Édition en cours de développement')}
                         className="text-indigo-600 hover:text-indigo-900 p-2"
                       >
                         <Edit className="h-5 w-5" />

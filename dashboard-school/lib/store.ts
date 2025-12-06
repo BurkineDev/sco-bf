@@ -22,6 +22,7 @@ interface AuthActions {
   setUser: (user: User | null) => void;
   setSchool: (school: School | null) => void;
   setLoading: (loading: boolean) => void;
+  setAuth: (user: User, school: School | null) => void;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   requestOtp: (phone: string) => Promise<{ success: boolean; error?: string; otpId?: string }>;
   verifyOtp: (phone: string, otp: string) => Promise<{ success: boolean; error?: string }>;
@@ -41,6 +42,7 @@ export const useAuthStore = create<AuthState & AuthActions>()(
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       setSchool: (school) => set({ school }),
       setLoading: (isLoading) => set({ isLoading }),
+      setAuth: (user, school) => set({ user, school, isAuthenticated: true }),
 
       login: async (email, password) => {
         set({ isLoading: true });
@@ -483,6 +485,7 @@ export const useStudentsStore = create<StudentsState & StudentsActions>((set, ge
         .from('students')
         .select(`
           id,
+          school_id,
           matricule,
           first_name,
           last_name,
@@ -493,10 +496,14 @@ export const useStudentsStore = create<StudentsState & StudentsActions>((set, ge
           parent_phone,
           parent_name,
           is_active,
+          created_at,
           classes!inner (
             id,
+            school_id,
             name,
-            academic_year_id
+            academic_year_id,
+            tuition_amount,
+            allow_installments
           ),
           tuition_accounts (
             total_amount,
@@ -516,17 +523,26 @@ export const useStudentsStore = create<StudentsState & StudentsActions>((set, ge
 
       const formattedStudents: Student[] = (students || []).map((s: any) => ({
         id: s.id,
+        school_id: s.school_id,
         matricule: s.matricule,
         first_name: s.first_name,
         last_name: s.last_name,
         display_name: s.display_name,
         class_id: s.class_id,
-        class_name: s.classes?.name,
         date_of_birth: s.date_of_birth,
         gender: s.gender,
         parent_phone: s.parent_phone,
         parent_name: s.parent_name,
         is_active: s.is_active,
+        created_at: s.created_at,
+        class: s.classes ? {
+          id: s.classes.id,
+          school_id: s.classes.school_id,
+          name: s.classes.name,
+          academic_year_id: s.classes.academic_year_id,
+          tuition_amount: s.classes.tuition_amount,
+          allow_installments: s.classes.allow_installments,
+        } : undefined,
         tuition: s.tuition_accounts?.[0] || null,
       }));
 
@@ -654,8 +670,10 @@ export const usePaymentsStore = create<PaymentsState & PaymentsActions>((set, ge
         .select(`
           id,
           reference,
+          tuition_account_id,
           amount,
           commission_amount,
+          commission_rate,
           net_amount,
           currency,
           channel,
@@ -693,10 +711,11 @@ export const usePaymentsStore = create<PaymentsState & PaymentsActions>((set, ge
       const formattedPayments: Payment[] = (payments || []).map((p: any) => ({
         id: p.id,
         reference: p.reference,
+        tuition_account_id: p.tuition_account_id,
         amount: p.amount,
         commission_amount: p.commission_amount,
+        commission_rate: p.commission_rate,
         net_amount: p.net_amount,
-        currency: p.currency,
         channel: p.channel,
         provider: p.provider,
         status: p.status,
@@ -705,9 +724,22 @@ export const usePaymentsStore = create<PaymentsState & PaymentsActions>((set, ge
         payer_phone: p.payer_phone,
         student: {
           id: p.tuition_accounts.students.id,
+          school_id: p.tuition_accounts.students.school_id,
           matricule: p.tuition_accounts.students.matricule,
-          name: p.tuition_accounts.students.display_name,
-          class_name: p.tuition_accounts.students.classes?.name,
+          first_name: p.tuition_accounts.students.first_name,
+          last_name: p.tuition_accounts.students.last_name,
+          display_name: p.tuition_accounts.students.display_name,
+          class_id: '',
+          is_active: true,
+          created_at: '',
+          class: {
+            id: '',
+            school_id: '',
+            name: p.tuition_accounts.students.classes?.name || '',
+            academic_year_id: '',
+            tuition_amount: 0,
+            allow_installments: false,
+          },
         },
       }));
 

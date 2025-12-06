@@ -102,6 +102,7 @@ export function StudentModal({ open, onOpenChange, student, onSuccess }: Student
         school_id: school.id,
         display_name: formData.display_name || `${formData.first_name} ${formData.last_name}`,
         is_active: true,
+        gender: formData.gender === '' ? undefined : (formData.gender as 'M' | 'F'),
       }
 
       if (student) {
