@@ -64,6 +64,7 @@ export interface Student {
   matricule: string;
   first_name: string;
   last_name: string;
+  display_name?: string;
   date_of_birth?: string;
   gender?: 'M' | 'F';
   parent_phone?: string;

@@ -7,13 +7,12 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { GraduationCap, Mail, Lock, Loader2 } from 'lucide-react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 
 export default function LoginDevPage() {
   const router = useRouter()
   const { setAuth, isAuthenticated } = useAuthStore()
-  const supabase = createClientComponentClient()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

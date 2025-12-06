@@ -52,7 +52,7 @@ export default function PaymentsPage() {
   const filteredPayments = payments.filter(payment => {
     const matchesSearch = search === '' ||
       payment.reference.toLowerCase().includes(search.toLowerCase()) ||
-      payment.student?.name.toLowerCase().includes(search.toLowerCase()) ||
+      payment.student?.display_name?.toLowerCase().includes(search.toLowerCase()) ||
       payment.student?.matricule.toLowerCase().includes(search.toLowerCase())
 
     return matchesSearch
@@ -250,10 +250,10 @@ export default function PaymentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div>
                           <div className="text-sm font-medium text-gray-900">
-                            {payment.student?.name}
+                            {payment.student?.display_name}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {payment.student?.matricule} - {payment.student?.class_name}
+                            {payment.student?.matricule} - {payment.student?.class?.name}
                           </div>
                         </div>
                       </td>
@@ -290,7 +290,7 @@ export default function PaymentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           className="text-indigo-600 hover:text-indigo-900"
-                          onClick={() => toast.info('Reçu en cours de développement')}
+                          onClick={() => toast('Reçu en cours de développement')}
                         >
                           <Eye className="h-5 w-5" />
                         </button>
