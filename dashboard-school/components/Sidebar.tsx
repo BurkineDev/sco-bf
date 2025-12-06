@@ -11,7 +11,11 @@ import {
   DollarSign,
   Settings,
   BarChart3,
-  FileText
+  FileText,
+  CreditCard,
+  Shield,
+  CalendarDays,
+  Upload
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -27,14 +31,34 @@ const menuItems = [
     icon: Users
   },
   {
+    title: 'Classes',
+    href: '/dashboard/classes',
+    icon: BookOpen
+  },
+  {
     title: 'Enseignants',
     href: '/dashboard/teachers',
     icon: GraduationCap
   },
   {
-    title: 'Classes',
-    href: '/dashboard/classes',
-    icon: BookOpen
+    title: 'Paiements',
+    href: '/dashboard/payments',
+    icon: CreditCard
+  },
+  {
+    title: 'Agents',
+    href: '/dashboard/agents',
+    icon: Shield
+  },
+  {
+    title: 'Années Académiques',
+    href: '/dashboard/academic-years',
+    icon: CalendarDays
+  },
+  {
+    title: 'Import Élèves',
+    href: '/dashboard/import',
+    icon: Upload
   },
   {
     title: 'Présences',
@@ -45,11 +69,6 @@ const menuItems = [
     title: 'Notes',
     href: '/dashboard/grades',
     icon: FileText
-  },
-  {
-    title: 'Finances',
-    href: '/dashboard/finance',
-    icon: DollarSign
   },
   {
     title: 'Statistiques',
