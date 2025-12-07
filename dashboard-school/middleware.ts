@@ -2,66 +2,60 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+  try {
+    const { pathname } = request.nextUrl
 
-  // Pages publiques qui ne nécessitent pas d'authentification
-  const publicPaths = ['/login', '/login-dev', '/']
-  const isPublicPath = publicPaths.some(path => pathname.startsWith(path))
-
-  // Routes API sont toujours publiques (déjà exclus par matcher)
-  if (pathname.startsWith('/api')) {
-    return NextResponse.next()
-  }
-
-  // Récupérer le token d'authentification depuis le localStorage via les cookies
-  const authStorage = request.cookies.get('dashboard-auth-storage')?.value
-
-  let isAuthenticated = false
-
-  if (authStorage) {
-    try {
-      const parsed = JSON.parse(authStorage)
-      isAuthenticated = parsed.state?.isAuthenticated || false
-    } catch (error) {
-      // Invalid JSON, considérer comme non authentifié
-      isAuthenticated = false
+    // Routes API - toujours autoriser
+    if (pathname.startsWith('/api')) {
+      return NextResponse.next()
     }
-  }
 
-  // Rediriger vers /login si on essaie d'accéder à une route protégée sans être authentifié
-  if (!isPublicPath && !isAuthenticated && !pathname.startsWith('/_next')) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(loginUrl)
-  }
+    // Fichiers statiques - toujours autoriser
+    if (pathname.startsWith('/_next')) {
+      return NextResponse.next()
+    }
 
-  // Rediriger vers /dashboard si on est déjà authentifié et qu'on essaie d'accéder à /login
-  if ((pathname === '/login' || pathname === '/login-dev') && isAuthenticated) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
+    // Pages publiques
+    const publicPaths = ['/login', '/login-dev']
+    const isPublicPath = publicPaths.some(path => pathname === path || pathname.startsWith(path + '/'))
 
-  // Rediriger la page d'accueil vers /dashboard si authentifié, sinon vers /login
-  if (pathname === '/') {
-    if (isAuthenticated) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    } else {
+    if (isPublicPath) {
+      return NextResponse.next()
+    }
+
+    // Page d'accueil - toujours rediriger vers login
+    if (pathname === '/') {
       return NextResponse.redirect(new URL('/login', request.url))
     }
-  }
 
-  return NextResponse.next()
+    // Pour toutes les autres routes, vérifier l'authentification
+    const authCookie = request.cookies.get('dashboard-auth-storage')?.value
+
+    if (!authCookie) {
+      // Pas de cookie = pas authentifié = rediriger vers login
+      const loginUrl = new URL('/login', request.url)
+      loginUrl.searchParams.set('redirect', pathname)
+      return NextResponse.redirect(loginUrl)
+    }
+
+    // Cookie présent, laisser passer
+    return NextResponse.next()
+  } catch (error) {
+    // En cas d'erreur dans le middleware, laisser passer la requête
+    console.error('Middleware error:', error)
+    return NextResponse.next()
+  }
 }
 
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
+     * Match all request paths except:
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - public files
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 }
