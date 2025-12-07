@@ -48,3 +48,4 @@ debug.log*
 android/.gradle/
 android/app/build/
 ios/Pods/
+SUPABASE-CREDENTIALS.txt
