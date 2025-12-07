@@ -5,11 +5,15 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Pages publiques qui ne nécessitent pas d'authentification
-  const publicPaths = ['/login', '/']
-  const isPublicPath = publicPaths.includes(pathname)
+  const publicPaths = ['/login', '/login-dev', '/']
+  const isPublicPath = publicPaths.some(path => pathname.startsWith(path))
+
+  // Routes API sont toujours publiques (déjà exclus par matcher)
+  if (pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
 
   // Récupérer le token d'authentification depuis le localStorage via les cookies
-  // Note: En production, utiliser des cookies HTTPOnly
   const authStorage = request.cookies.get('dashboard-auth-storage')?.value
 
   let isAuthenticated = false
@@ -25,14 +29,14 @@ export function middleware(request: NextRequest) {
   }
 
   // Rediriger vers /login si on essaie d'accéder à une route protégée sans être authentifié
-  if (!isPublicPath && !isAuthenticated) {
+  if (!isPublicPath && !isAuthenticated && !pathname.startsWith('/_next')) {
     const loginUrl = new URL('/login', request.url)
     loginUrl.searchParams.set('redirect', pathname)
     return NextResponse.redirect(loginUrl)
   }
 
   // Rediriger vers /dashboard si on est déjà authentifié et qu'on essaie d'accéder à /login
-  if (pathname === '/login' && isAuthenticated) {
+  if ((pathname === '/login' || pathname === '/login-dev') && isAuthenticated) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
@@ -56,7 +60,8 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - public files
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
