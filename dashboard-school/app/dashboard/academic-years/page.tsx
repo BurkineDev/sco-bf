@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useAcademicYearsStore, useAuthStore } from '@/lib/store'
 import toast from 'react-hot-toast'
+import { AddAcademicYearModal } from '@/components/academic-years/AddAcademicYearModal'
 
 export default function AcademicYearsPage() {
   const { school } = useAuthStore()
@@ -217,47 +218,11 @@ export default function AcademicYearsPage() {
         </CardContent>
       </Card>
 
-      {/* Modal Ajout (à implémenter) */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">
-              Nouvelle Année Académique
-            </h2>
-            <p className="text-gray-600 mb-4">
-              Fonctionnalité en cours de développement
-            </p>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Libellé (ex: 2024-2025)
-                </label>
-                <Input placeholder="2024-2025" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date de début
-                </label>
-                <Input type="date" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Date de fin
-                </label>
-                <Input type="date" />
-              </div>
-              <div className="flex space-x-2">
-                <Button onClick={() => setShowAddModal(false)} variant="outline" className="flex-1">
-                  Annuler
-                </Button>
-                <Button className="flex-1">
-                  Créer
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal Ajout */}
+      <AddAcademicYearModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+      />
     </div>
   )
 }
