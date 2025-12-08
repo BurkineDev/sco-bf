@@ -11,7 +11,8 @@ import {
   DollarSign,
   Settings,
   BarChart3,
-  FileText
+  FileText,
+  Database
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -55,6 +56,11 @@ const menuItems = [
     title: 'Statistiques',
     href: '/dashboard/statistics',
     icon: BarChart3
+  },
+  {
+    title: 'Test DB',
+    href: '/dashboard/test-db',
+    icon: Database
   },
   {
     title: 'Paramètres',
