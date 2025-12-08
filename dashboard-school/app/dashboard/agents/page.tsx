@@ -12,6 +12,7 @@ import {
 import { useAgentsStore, useAuthStore } from '@/lib/store'
 import toast from 'react-hot-toast'
 import { AddAgentModal } from '@/components/agents/AddAgentModal'
+import { EditAgentModal } from '@/components/agents/EditAgentModal'
 
 export default function AgentsPage() {
   const { school } = useAuthStore()
@@ -19,12 +20,19 @@ export default function AgentsPage() {
 
   const [search, setSearch] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedAgent, setSelectedAgent] = useState<any>(null)
 
   useEffect(() => {
     if (school) {
       fetchAgents()
     }
   }, [school, fetchAgents])
+
+  const handleEdit = (agent: any) => {
+    setSelectedAgent(agent)
+    setShowEditModal(true)
+  }
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     const result = await updateAgent(id, { is_active: !currentStatus })
@@ -218,8 +226,9 @@ export default function AgentsPage() {
                             <Shield className="h-5 w-5" />
                           </button>
                           <button
-                            onClick={() => toast('Édition en cours de développement')}
+                            onClick={() => handleEdit(agent)}
                             className="text-indigo-600 hover:text-indigo-900"
+                            title="Éditer"
                           >
                             <Edit className="h-5 w-5" />
                           </button>
@@ -238,6 +247,16 @@ export default function AgentsPage() {
       <AddAgentModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
+      />
+
+      {/* Modal Édition */}
+      <EditAgentModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setSelectedAgent(null)
+        }}
+        agent={selectedAgent}
       />
     </div>
   )

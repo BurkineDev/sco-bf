@@ -9,6 +9,7 @@ import { useStudentsStore, useAuthStore, useDashboardStore } from '@/lib/store'
 import { formatCurrency, formatDate, getInitials } from '@/lib/utils'
 import toast from 'react-hot-toast'
 import { AddStudentModal } from '@/components/students/AddStudentModal'
+import { EditStudentModal } from '@/components/students/EditStudentModal'
 
 export default function StudentsPage() {
   const { school } = useAuthStore()
@@ -23,6 +24,8 @@ export default function StudentsPage() {
   const { classes, fetchClasses } = useDashboardStore()
   const [searchTerm, setSearchTerm] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<any>(null)
 
   useEffect(() => {
     if (school?.id) {
@@ -30,6 +33,11 @@ export default function StudentsPage() {
       fetchClasses(school.id)
     }
   }, [school, fetchStudents, fetchClasses])
+
+  const handleEdit = (student: any) => {
+    setSelectedStudent(student)
+    setShowEditModal(true)
+  }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir désactiver cet élève ?')) {
@@ -234,7 +242,7 @@ export default function StudentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => toast('Édition prochainement disponible')}
+                            onClick={() => handleEdit(student)}
                             className="text-indigo-600 hover:text-indigo-900"
                             title="Éditer"
                           >
@@ -262,6 +270,17 @@ export default function StudentsPage() {
       <AddStudentModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
+        classes={classes}
+      />
+
+      {/* Edit Student Modal */}
+      <EditStudentModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setSelectedStudent(null)
+        }}
+        student={selectedStudent}
         classes={classes}
       />
     </div>

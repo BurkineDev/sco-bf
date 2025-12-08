@@ -11,6 +11,7 @@ import {
 import { useAcademicYearsStore, useAuthStore } from '@/lib/store'
 import toast from 'react-hot-toast'
 import { AddAcademicYearModal } from '@/components/academic-years/AddAcademicYearModal'
+import { EditAcademicYearModal } from '@/components/academic-years/EditAcademicYearModal'
 
 export default function AcademicYearsPage() {
   const { school } = useAuthStore()
@@ -25,12 +26,19 @@ export default function AcademicYearsPage() {
   } = useAcademicYearsStore()
 
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedYear, setSelectedYear] = useState<any>(null)
 
   useEffect(() => {
     if (school) {
       fetchAcademicYears()
     }
   }, [school, fetchAcademicYears])
+
+  const handleEdit = (year: any) => {
+    setSelectedYear(year)
+    setShowEditModal(true)
+  }
 
   const handleSetCurrent = async (id: string) => {
     const result = await setCurrentYear(id)
@@ -196,8 +204,9 @@ export default function AcademicYearsPage() {
                         </Button>
                       )}
                       <button
-                        onClick={() => toast('Édition en cours de développement')}
+                        onClick={() => handleEdit(year)}
                         className="text-indigo-600 hover:text-indigo-900 p-2"
+                        title="Éditer"
                       >
                         <Edit className="h-5 w-5" />
                       </button>
@@ -222,6 +231,16 @@ export default function AcademicYearsPage() {
       <AddAcademicYearModal
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
+      />
+
+      {/* Modal Édition */}
+      <EditAcademicYearModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setSelectedYear(null)
+        }}
+        academicYear={selectedYear}
       />
     </div>
   )
