@@ -1,22 +1,25 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Users, DollarSign, Loader2 } from 'lucide-react'
-import { useDashboardStore } from '@/lib/store'
-import { useAuthStore } from '@/lib/store'
+import { useDashboardStore, useAuthStore, useAcademicYearsStore } from '@/lib/store'
+import { AddClassModal } from '@/components/classes/AddClassModal'
 
 export default function ClassesPage() {
   const { school } = useAuthStore()
   const { classes, fetchClasses } = useDashboardStore()
+  const { academicYears, fetchAcademicYears } = useAcademicYearsStore()
+  const [showAddModal, setShowAddModal] = useState(false)
 
   useEffect(() => {
     if (school) {
       fetchClasses(school.id)
+      fetchAcademicYears()
     }
-  }, [school, fetchClasses])
+  }, [school, fetchClasses, fetchAcademicYears])
 
   const totalStudents = classes.reduce((acc, c: any) => acc + (c.students?.[0]?.count || 0), 0)
 
@@ -48,7 +51,7 @@ export default function ClassesPage() {
           <h1 className="text-3xl font-bold text-gray-900">Classes</h1>
           <p className="text-gray-600 mt-1">Gérez vos classes et leurs effectifs</p>
         </div>
-        <Button className="flex items-center space-x-2">
+        <Button onClick={() => setShowAddModal(true)} className="flex items-center space-x-2">
           <Plus className="h-5 w-5" />
           <span>Nouvelle Classe</span>
         </Button>
@@ -141,12 +144,19 @@ export default function ClassesPage() {
       {classes.length === 0 && (
         <div className="text-center py-12">
           <p className="text-gray-500">Aucune classe trouvée pour l'année en cours</p>
-          <Button className="mt-4">
+          <Button onClick={() => setShowAddModal(true)} className="mt-4">
             <Plus className="h-4 w-4 mr-2" />
             Créer une classe
           </Button>
         </div>
       )}
+
+      {/* Add Class Modal */}
+      <AddClassModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        academicYears={academicYears.map(year => ({ id: year.id, name: year.label }))}
+      />
     </div>
   )
 }

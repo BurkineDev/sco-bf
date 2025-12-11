@@ -8,6 +8,7 @@ import { Platform } from 'react-native';
 
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'https://your-project.supabase.co';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'your-anon-key';
+const API_URL = process.env.EXPO_PUBLIC_API_URL || 'https://sco-bf.vercel.app';
 
 // Custom storage adapter pour React Native
 const ExpoSecureStoreAdapter = {
@@ -58,7 +59,15 @@ export type ApiError = {
 // URL de base pour les Edge Functions
 export const FUNCTIONS_URL = `${SUPABASE_URL}/functions/v1`;
 
-// Helper pour appeler les Edge Functions avec auth
+// Mapping des noms de fonctions vers les API routes Next.js
+const API_ROUTES: Record<string, string> = {
+  'auth-otp/request': '/api/auth/send-otp',
+  'auth-otp/verify': '/api/auth/verify-otp',
+  'create-payment-intent': '/api/payments/create',
+  'parent-students': '/api/students/list',
+};
+
+// Helper pour appeler les API routes Next.js avec auth
 export async function callFunction<T>(
   functionName: string,
   body: Record<string, unknown>,
@@ -66,16 +75,20 @@ export async function callFunction<T>(
 ): Promise<ApiResponse<T>> {
   try {
     const { data: { session } } = await supabase.auth.getSession();
-    
+
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
-    
+
     if (session?.access_token) {
       headers['Authorization'] = `Bearer ${session.access_token}`;
     }
 
-    const response = await fetch(`${FUNCTIONS_URL}/${functionName}`, {
+    // Utiliser le mapping pour les API routes Next.js
+    const apiRoute = API_ROUTES[functionName] || `/${functionName}`;
+    const url = `${API_URL}${apiRoute}`;
+
+    const response = await fetch(url, {
       method,
       headers,
       body: method !== 'GET' ? JSON.stringify(body) : undefined,
