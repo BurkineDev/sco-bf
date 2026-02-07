@@ -290,7 +290,10 @@ export default function PaymentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <button
                           className="text-indigo-600 hover:text-indigo-900"
-                          onClick={() => toast('Reçu en cours de développement')}
+                          onClick={() => {
+                            window.open(`/api/receipts/${payment.id}`, '_blank')
+                          }}
+                          title="Télécharger le reçu"
                         >
                           <Eye className="h-5 w-5" />
                         </button>
