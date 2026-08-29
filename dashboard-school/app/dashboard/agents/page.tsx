@@ -11,6 +11,8 @@ import {
 } from 'lucide-react'
 import { useAgentsStore, useAuthStore } from '@/lib/store'
 import toast from 'react-hot-toast'
+import { AddAgentModal } from '@/components/agents/AddAgentModal'
+import { EditAgentModal } from '@/components/agents/EditAgentModal'
 
 export default function AgentsPage() {
   const { school } = useAuthStore()
@@ -18,12 +20,19 @@ export default function AgentsPage() {
 
   const [search, setSearch] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedAgent, setSelectedAgent] = useState<any>(null)
 
   useEffect(() => {
     if (school) {
       fetchAgents()
     }
   }, [school, fetchAgents])
+
+  const handleEdit = (agent: any) => {
+    setSelectedAgent(agent)
+    setShowEditModal(true)
+  }
 
   const handleToggleStatus = async (id: string, currentStatus: boolean) => {
     const result = await updateAgent(id, { is_active: !currentStatus })
@@ -217,8 +226,9 @@ export default function AgentsPage() {
                             <Shield className="h-5 w-5" />
                           </button>
                           <button
-                            onClick={() => toast('Édition en cours de développement')}
+                            onClick={() => handleEdit(agent)}
                             className="text-indigo-600 hover:text-indigo-900"
+                            title="Éditer"
                           >
                             <Edit className="h-5 w-5" />
                           </button>
@@ -233,20 +243,21 @@ export default function AgentsPage() {
         </CardContent>
       </Card>
 
-      {/* Modal Ajout (à implémenter) */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Nouvel Agent</h2>
-            <p className="text-gray-600 mb-4">
-              Fonctionnalité en cours de développement
-            </p>
-            <Button onClick={() => setShowAddModal(false)}>
-              Fermer
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Modal Ajout */}
+      <AddAgentModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+      />
+
+      {/* Modal Édition */}
+      <EditAgentModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setSelectedAgent(null)
+        }}
+        agent={selectedAgent}
+      />
     </div>
   )
 }

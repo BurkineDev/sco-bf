@@ -243,6 +243,7 @@ interface DashboardState {
 interface DashboardActions {
   fetchStats: (schoolId: string) => Promise<void>;
   fetchClasses: (schoolId: string) => Promise<void>;
+  addClass: (classData: Partial<Class>) => Promise<{ success: boolean; error?: string }>;
   fetchRecentPayments: (schoolId: string, limit?: number) => Promise<void>;
   fetchAcademicYears: (schoolId: string) => Promise<void>;
   setSelectedAcademicYear: (year: AcademicYear | null) => void;
@@ -334,6 +335,29 @@ export const useDashboardStore = create<DashboardState & DashboardActions>((set,
       set({ classes: data || [] });
     } catch (error) {
       console.error('Fetch classes error:', error);
+    }
+  },
+
+  addClass: async (classData) => {
+    try {
+      const { data, error } = await supabase
+        .from('classes')
+        .insert([classData])
+        .select()
+        .single();
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+
+      // Refresh classes list
+      if (classData.school_id) {
+        get().fetchClasses(classData.school_id);
+      }
+
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: 'Erreur lors de la création de la classe' };
     }
   },
 

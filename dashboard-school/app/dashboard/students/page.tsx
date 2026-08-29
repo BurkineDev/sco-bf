@@ -5,9 +5,11 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Plus, Search, Filter, Download, Edit, Trash2, Users } from 'lucide-react'
-import { useStudentsStore, useAuthStore } from '@/lib/store'
+import { useStudentsStore, useAuthStore, useDashboardStore } from '@/lib/store'
 import { formatCurrency, formatDate, getInitials } from '@/lib/utils'
 import toast from 'react-hot-toast'
+import { AddStudentModal } from '@/components/students/AddStudentModal'
+import { EditStudentModal } from '@/components/students/EditStudentModal'
 
 export default function StudentsPage() {
   const { school } = useAuthStore()
@@ -19,14 +21,23 @@ export default function StudentsPage() {
     deleteStudent
   } = useStudentsStore()
 
+  const { classes, fetchClasses } = useDashboardStore()
   const [searchTerm, setSearchTerm] = useState('')
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedStudent, setSelectedStudent] = useState<any>(null)
 
   useEffect(() => {
-    if (school) {
+    if (school?.id) {
       fetchStudents()
+      fetchClasses(school.id)
     }
-  }, [school, fetchStudents])
+  }, [school, fetchStudents, fetchClasses])
+
+  const handleEdit = (student: any) => {
+    setSelectedStudent(student)
+    setShowEditModal(true)
+  }
 
   const handleDelete = async (id: string) => {
     if (!confirm('Êtes-vous sûr de vouloir désactiver cet élève ?')) {
@@ -37,6 +48,7 @@ export default function StudentsPage() {
 
     if (result.success) {
       toast.success('Élève désactivé avec succès')
+      fetchStudents() // Refresh the list
     } else {
       toast.error(result.error || 'Erreur lors de la désactivation')
     }
@@ -230,14 +242,16 @@ export default function StudentsPage() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex space-x-2">
                           <button
-                            onClick={() => toast('Édition en cours de développement')}
+                            onClick={() => handleEdit(student)}
                             className="text-indigo-600 hover:text-indigo-900"
+                            title="Éditer"
                           >
                             <Edit className="h-5 w-5" />
                           </button>
                           <button
                             onClick={() => handleDelete(student.id)}
                             className="text-red-600 hover:text-red-900"
+                            title="Désactiver"
                           >
                             <Trash2 className="h-5 w-5" />
                           </button>
@@ -252,20 +266,23 @@ export default function StudentsPage() {
         </CardContent>
       </Card>
 
-      {/* Modal Ajout (à implémenter) */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Nouvel Élève</h2>
-            <p className="text-gray-600 mb-4">
-              Fonctionnalité en cours de développement. Utilisez la page Import pour ajouter des élèves en masse.
-            </p>
-            <Button onClick={() => setShowAddModal(false)}>
-              Fermer
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Add Student Modal */}
+      <AddStudentModal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        classes={classes}
+      />
+
+      {/* Edit Student Modal */}
+      <EditStudentModal
+        isOpen={showEditModal}
+        onClose={() => {
+          setShowEditModal(false)
+          setSelectedStudent(null)
+        }}
+        student={selectedStudent}
+        classes={classes}
+      />
     </div>
   )
 }
